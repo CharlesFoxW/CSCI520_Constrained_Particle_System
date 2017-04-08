@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "openGL-headers.h"
+#include <gsl/gsl_linalg.h>
 
 #define PI  3.141592653589793238462643383279
 #define N   12
@@ -33,6 +34,7 @@ public:
     double numOfB;
     double constraintVector[N+2];
     double stateQ[2*N+2];
+    double stateQV[2*N+2];
 };
 
 

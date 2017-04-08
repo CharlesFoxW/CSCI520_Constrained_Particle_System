@@ -54,7 +54,7 @@ void display() {
     glBegin(GL_POINTS);
     glColor3f(0.8, 0.3, 0.3);
     for (int i = 0; i < N + 1; i++) {
-        printf("%d, %.2f, %.2f \n", i, mainChain.stateQ[2*i], mainChain.stateQ[2*i+1]);
+        //printf("%d, %.2f, %.2f \n", i, mainChain.stateQ[2*i], mainChain.stateQ[2*i+1]);
         glVertex2f((float) mainChain.stateQ[2*i], (float) mainChain.stateQ[2*i+1]);
     }
 
