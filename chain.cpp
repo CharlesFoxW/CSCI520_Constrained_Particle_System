@@ -54,12 +54,14 @@ void Chain::alterChainByGravity() {
     }
 
     // gravity force:
-    for (int i = 2; i < 2*N+2; i+=2) {
+    for (int i = 0; i < 2*N+2; i+=2) {
         ft[i] = 0;
         ft[i+1] = -1.0;
     }
 
     // calculated dC/dQ:
+    delCQ[0][0] = 1.0;
+    delCQ[1][1] = 1.0;
     delCQ[2][2] = 2 * stateQ[2];
     delCQ[2][3] = 2 * stateQ[3];
     for (int i = 3; i < N+2; i++) {
@@ -76,6 +78,8 @@ void Chain::alterChainByGravity() {
     }
 
     // get dC'/dQ:
+    delCQDelTime[0][0] = stateQV[0];
+    delCQDelTime[1][1] = stateQV[1];
     delCQDelTime[2][2] = 2 * stateQV[2];
     delCQDelTime[2][3] = 2 * stateQV[3];
     for (int i = 3; i < N+2; i++) {
@@ -97,9 +101,9 @@ void Chain::alterChainByGravity() {
         for (int j = 0; j < 2*N+2; j++) {
             factor1 += delCQ[i][j] * stateQDelTime[j];
         }
-        //secondB[i] = -1.0 * factor1 - 0.1 * factor2 - 0.3 * constraintVector[i];
+        secondB[i] = -1.0 * factor1 - 0.1 * factor2 - 0.3 * constraintVector[i];
         //secondB[i] = -1.0 * factor1 - 2.0 * numOfB * factor2 - pow(numOfB, 2.0) * constraintVector[i];
-        secondB[i] = -1.0 * factor1;
+        //secondB[i] = -1.0 * factor1;
     }
 
 
