@@ -19,6 +19,8 @@
 #define N   12
 #define dt  0.001
 
+enum ForceType {None, Up, Down, Left, Right};
+
 struct Point {
     double x;
     double y;
@@ -28,11 +30,15 @@ class Chain {
 public:
     Chain();
     ~Chain();
-    void alterChainByGravity();
+    void alterChainByGravity(ForceType force);
+    void addAccUp();
+    void addAccDown();
+    void addAccLeft();
+    void addAccRight();
 
     double edgeLength;
     double numOfB;
-    double constraintVector[N+2];
+    double constraintVector[N+2+1];
     double stateQ[2*N+2];
     double stateQV[2*N+2];
 };
