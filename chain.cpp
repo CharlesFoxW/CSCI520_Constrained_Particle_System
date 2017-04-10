@@ -30,7 +30,9 @@ Chain::Chain() {
         constraintVector[i] = pow(stateQ[2*i-2] - stateQ[2*i-4], 2.0)
                               + pow(stateQ[2*i-1] - stateQ[2*i-3], 2.0) - pow(edgeLength, 2.0);
     }
-    constraintVector[N+2] = pow(stateQ[2*N], 2.0) + pow(stateQ[2*N+1] + 0.5, 2.0) - 0.25;
+    if (!g_released) {
+        constraintVector[N + 2] = pow(stateQ[2 * N], 2.0) + pow(stateQ[2 * N + 1] + 0.5, 2.0) - 0.25;
+    }
 }
 
 Chain::~Chain() {
@@ -70,8 +72,11 @@ void Chain::alterChainByGravity(ForceType force) {
         delCQ[i][2*i-2] = 2.0 * (stateQ[2*i-2] - stateQ[2*i-4]);
         delCQ[i][2*i-1] = 2.0 * (stateQ[2*i-1] - stateQ[2*i-3]);
     }
-    delCQ[N+2][2*N] = 2.0 * stateQ[2*N];
-    delCQ[N+2][2*N+1] = 2.0 * stateQ[2*N+1] + 0.99;
+    if (!g_released) {
+        delCQ[N+2][2*N] = 2.0 * stateQ[2*N];
+        delCQ[N+2][2*N+1] = 2.0 * stateQ[2*N+1] + 0.99;
+    }
+
 
     // get dC/dQ transpose:
     for (int i = 0; i < 2*N+2; i++) {
@@ -91,8 +96,11 @@ void Chain::alterChainByGravity(ForceType force) {
         delCQDelTime[i][2*i-2] = 2.0 * (stateQV[2*i-2] - stateQV[2*i-4]);
         delCQDelTime[i][2*i-1] = 2.0 * (stateQV[2*i-1] - stateQV[2*i-3]);
     }
-    delCQDelTime[N+2][2*N] = 2.0 * stateQV[2*N];
-    delCQDelTime[N+2][2*N+1] = 2.0 * stateQV[2*N+1] + 0.99;
+    if (!g_released) {
+        delCQDelTime[N+2][2*N] = 2.0 * stateQV[2*N];
+        delCQDelTime[N+2][2*N+1] = 2.0 * stateQV[2*N+1] + 0.99;
+    }
+
 
     for (int i = 0; i < 2*N+2; i++) {
         stateQDelTime[i] = stateQV[i];
@@ -149,20 +157,24 @@ void Chain::alterChainByGravity(ForceType force) {
         b_data[i] = ft[i] - 0.5 * stateQV[i];
     }
 
+    int endPoint = N;
+    if (!g_released)
+        endPoint++;
+
     if (force == Up) {
-        for (int i = 2; i < N; i++) {
+        for (int i = 2; i < endPoint; i++) {
             b_data[2*i+1] += 10.0;
         }
     } else if (force == Down) {
-        for (int i = 2; i < N; i++) {
+        for (int i = 2; i < endPoint; i++) {
             b_data[2*i+1] += -10.0;
         }
     } else if (force == Left) {
-        for (int i = 2; i < N; i++) {
+        for (int i = 2; i < endPoint; i++) {
             b_data[2*i] += -10.0;
         }
     } else if (force == Right) {
-        for (int i = 2; i < N; i++) {
+        for (int i = 2; i < endPoint; i++) {
             b_data[2*i] += 10.0;
         }
     }

@@ -1,7 +1,11 @@
 #include "chain.h"
 
+time_t timer, startTime;
 int windowWidth, windowHeight;
 Chain mainChain;
+bool g_released, saveScreenToFile;
+int sprite;
+
 int g_vMousePos[2];
 int g_iRightMouseButton;
 
@@ -26,14 +30,45 @@ void myinit() {
     glEnable(GL_POLYGON_SMOOTH);
     glEnable(GL_LINE_SMOOTH);
 
+    g_released = false;
+    saveScreenToFile = false;
+    sprite = 0;
+
     if (N > 1)
         mainChain = Chain();
     else {
         printf("Error::N has to be greater than 2.");
         exit(0);
     }
-
+    printf("Program Starts.\n");
+    time(&startTime);
+    printf("t = %s\n", ctime(&startTime));
     return;
+}
+
+/* Write a screenshot, in the PPM format, to the specified filename, in PPM format */
+void saveScreenshot(int windowWidth, int windowHeight, char *filename)
+{
+    if (filename == NULL)
+        return;
+
+    // Allocate a picture buffer
+    Pic * in = pic_alloc(windowWidth, windowHeight, 3, NULL);
+
+    printf("File to save to: %s\n", filename);
+
+    for (int i=windowHeight-1; i>=0; i--)
+    {
+        glReadPixels(0, windowHeight-i-1, windowWidth, 1, GL_RGB, GL_UNSIGNED_BYTE,
+                     &in->pix[i*in->nx*in->bpp]);
+    }
+
+    if (ppm_write(filename, in))
+        printf("File saved Successfully\n");
+    else
+        printf("Error in Saving\n");
+
+    pic_free(in);
 }
 
 
@@ -107,6 +142,10 @@ void display() {
     //glPointSize(6);
     //glBegin(GL_POINTS);
     glColor3f(0.7, 0.6, 0.3);
+
+    time(&timer);
+    printf("At time: %s", ctime(&timer));
+    printf("q = \n");
     for (int i = 0; i < N+1; i++) {
         //printf("%d, %.2f, %.2f \n", i, mainChain.stateQ[2*i], mainChain.stateQ[2*i+1]);
         //glVertex2f((float) mainChain.stateQ[2*i], (float) mainChain.stateQ[2*i+1]);
@@ -114,7 +153,7 @@ void display() {
         glTranslatef((float) mainChain.stateQ[2*i], (float) mainChain.stateQ[2*i+1], 0);
         glutSolidSphere(0.0075,50,50);
         glTranslatef((float) (-1.0 * mainChain.stateQ[2*i]), (float) (-1.0 * mainChain.stateQ[2*i+1]), 0);
-        //glTranslatef(0, 0, 0);
+        printf("%4.5f, %4.5f\n", mainChain.stateQ[2*i], mainChain.stateQ[2*i+1]);
     }
     //glEnd();
 
@@ -144,6 +183,26 @@ void display() {
     //glutSolidSphere(0.1,100,100);
     //glPopMatrix();
     //glFlush();
+
+
+
+    // save screen to file
+    char s[20]="picxxxx.ppm";
+    s[3] = 48 + (sprite / 1000);
+    s[4] = 48 + (sprite % 1000) / 100;
+    s[5] = 48 + (sprite % 100 ) / 10;
+    s[6] = 48 + sprite % 10;
+    if (saveScreenToFile)
+    {
+        saveScreenshot(windowWidth, windowHeight, s);
+        //saveScreenToFile=0; // save only once, change this if you want continuos image generation (i.e. animation)
+        sprite++;
+    }
+
+    if (sprite >= 300) // allow only 300 snapshots
+    {
+        exit(0);
+    }
 
 
     glutSwapBuffers();
@@ -229,6 +288,14 @@ void keyboardFunc (unsigned char key, int x, int y) {
         case 27: // esc
             exit(0);
             break;
+        case 'r':
+            if (!g_released)
+                g_released = true;
+            break;
+        case 's':
+            saveScreenToFile = true;
+        default:
+            break;
     }
 }
 
@@ -249,6 +316,8 @@ void SpecialInput(int key, int x, int y) {
         case GLUT_KEY_RIGHT:
             // add acceleration to +y direction
             mainChain.addAccRight();
+            break;
+        default:
             break;
     }
 }

@@ -54,7 +54,7 @@ SET(CHAIN_SOURCE
 SET(CHAIN_HEADERS
 
 
-        openGL-headers.h chain.h)
+        openGL-headers.h chain.h pic.h pic.cpp ppm.cpp)
 
 #########################################################
 # ADD EXECUTABLES

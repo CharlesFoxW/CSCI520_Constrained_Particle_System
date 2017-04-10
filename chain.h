@@ -10,14 +10,18 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include "openGL-headers.h"
+#include "pic.h"
 #include <gsl/gsl_linalg.h>
 
 #define PI  3.141592653589793238462643383279
 #define N   12
 #define dt  0.001
+
+extern bool g_released;
 
 enum ForceType {None, Up, Down, Left, Right};
 
